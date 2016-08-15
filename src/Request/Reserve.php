@@ -58,6 +58,12 @@ class Reserve extends AbstractRequest
     private $cvv;
 
     /**
+     * A json string with any aditional information that needs to be sent to the reserve call
+     * @var string
+     */
+    private $additionalInformation;
+
+    /**
      * Set the Order ID
      * @see Reserve::orderID
      * @param string $orderID
@@ -194,6 +200,26 @@ class Reserve extends AbstractRequest
     }
 
     /**
+     * Get json string with the set additional data
+     * @return string
+     */
+    public function getAdditionalInformation()
+    {
+        return $this->additionalInformation;
+    }
+
+    /**
+     * Set json string with the set additional data
+     * @param $additionalInformation
+     * @return $this
+     */
+    public function setAdditionalInformation($additionalInformation)
+    {
+        $this->additionalInformation = $additionalInformation;
+        return $this;
+    }
+
+    /**
      * Get the serializer data
      * @return array
      */
@@ -210,6 +236,10 @@ class Reserve extends AbstractRequest
 
         if (!empty($this->amount)) {
             $data['amount'] = $this->getAmount();
+        }
+
+        if (!empty($this->additionalInformation)) {
+            $data['additionalInformation'] = $this->getAdditionalInformation();
         }
 
         if (!empty($this->cvv)) {
