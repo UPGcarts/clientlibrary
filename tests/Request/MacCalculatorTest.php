@@ -6,6 +6,8 @@ namespace Upg\Library\Tests\Request;
 use Upg\Library\Config;
 use Upg\Library\Mac\Exception\MacInvalid;
 use Upg\Library\Request\MacCalculator;
+use Upg\Library\Tests\Mock\Request\CustomValidationRequest;
+use Upg\Library\Tests\Mock\Request\ExcludedFieldsRequest;
 use Upg\Library\Tests\Mock\Request\JsonRequestWithArray;
 use Upg\Library\Tests\Mock\Request\TopLevelRequest;
 
@@ -115,6 +117,38 @@ class MacCalculatorTest extends \PHPUnit_Framework_TestCase
             $macCalculator->validate('f36343aa3af500dce48464b931111cb861101753', false),
             "Validation returned true"
         );
+    }
+
+    /**
+     * Make sure that the excluded field is not included in the mac
+     */
+    public function testPartialMacGeneration()
+    {
+        $request = new ExcludedFieldsRequest($this->config);
+
+        $request->data = array('orderID' => 'testOrder', 'excluded' => 'foo');
+
+        $macCalculator = new MacCalculator();
+        $macCalculator->setConfig($this->config);
+        $macCalculator->setRequest($request);
+
+        $this->assertTrue($macCalculator->validate('4362f9c76dba97492a193615ce7902e2d60484c0'));
+    }
+
+    /**
+     * Make sure this does not cause problems if the field is optional
+     */
+    public function testMissingExcludedTest()
+    {
+        $request = new ExcludedFieldsRequest($this->config);
+
+        $request->data = array('orderID' => 'testOrder');
+
+        $macCalculator = new MacCalculator();
+        $macCalculator->setConfig($this->config);
+        $macCalculator->setRequest($request);
+
+        $this->assertTrue($macCalculator->validate('4362f9c76dba97492a193615ce7902e2d60484c0'));
     }
 
 }

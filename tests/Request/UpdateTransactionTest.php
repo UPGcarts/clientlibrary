@@ -6,6 +6,7 @@ use Faker\Factory;
 use Upg\Library\Config;
 use Upg\Library\Locale\Codes;
 use Upg\Library\PaymentMethods\Methods;
+use Upg\Library\Request\MacCalculator;
 use Upg\Library\Request\Objects\Amount;
 use Upg\Library\Request\Objects\Attributes\File;
 use Upg\Library\Request\UpdateTransaction;
@@ -75,9 +76,11 @@ class UpdateTransactionTest extends AbstractRequestTest
             ->setInvoiceDate(new \DateTime())
             ->setOriginalInvoiceAmount($this->getAmount())
             ->setDueDate(new \DateTime())
+            ->setPaymentTarget(new \DateTime())
             ->setInvoicePDF($this->getFile())
             ->setShippingDate(new \DateTime())
-            ->setTrackingID(111);
+            ->setTrackingID(111)
+            ->setRemark('a short descriptive sentence');
 
         $validation = new Validation();
 
@@ -91,23 +94,42 @@ class UpdateTransactionTest extends AbstractRequestTest
         $this->assertArrayHasKey('orderID', $serializeData, "Order ID not set");
         $this->assertArrayHasKey('captureID', $serializeData, "captureID not set");
         $this->assertArrayHasKey('invoiceNumber', $serializeData, "invoiceNumber not set");
-        $this->assertArrayHasKey('originalInvoiceAmount', $serializeData, "originalInvoiceAmount not set");
         $this->assertArrayHasKey('invoiceDate', $serializeData, "invoiceDate not set");
+        $this->assertArrayHasKey('originalInvoiceAmount', $serializeData, "originalInvoiceAmount not set");
         $this->assertArrayHasKey('dueDate', $serializeData, "dueDate not set");
+        $this->assertArrayHasKey('paymentTarget', $serializeData, "paymentTarget not set");
         $this->assertArrayHasKey('invoicePDF', $serializeData, "invoicePDF not set");
         $this->assertArrayHasKey('shippingDate', $serializeData, "shippingDate not set");
         $this->assertArrayHasKey('trackingID', $serializeData, "trackingID not set");
-
-        $fileBase64 = base64_encode(file_get_contents(__FILE__));
+        $this->assertArrayHasKey('remark', $serializeData, "remark not set");
 
         $this->assertEquals(1, $serializeData['orderID']);
         $this->assertEquals(1, $serializeData['captureID']);
         $this->assertInstanceOf('\Upg\Library\Request\Objects\Amount', $serializeData['originalInvoiceAmount']);
         $this->assertRegExp('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $serializeData['invoiceDate']);
         $this->assertRegExp('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $serializeData['dueDate']);
-        $this->assertEquals($fileBase64, $serializeData['invoicePDF']);
         $this->assertRegExp('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $serializeData['shippingDate']);
+        $this->assertRegExp('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $serializeData['paymentTarget']);
         $this->assertEquals(111, $serializeData['trackingID']);
+        $this->assertEquals('@' . $this->getFile()->getPath(), $serializeData['invoicePDF']);
+        $this->assertEquals('a short descriptive sentence', $serializeData['remark']);
+    }
+
+    public function testOptionalValuesDoNotNeedToBeSet()
+    {
+        $request = new UpdateTransaction($this->config);
+
+        $request->setOrderID(1)
+                ->setInvoiceNumber(1)
+                ->setInvoiceDate(new \DateTime())
+                ->setOriginalInvoiceAmount($this->getAmount());
+
+        $validation = new Validation();
+
+        $validation->getValidator($request);
+        $data = $validation->performValidation();
+
+        $this->assertEmpty($data, "Validation found an issue when there should be none");
     }
 
     public function testUpdateTransactionValidationOrderID()
@@ -123,6 +145,8 @@ class UpdateTransactionTest extends AbstractRequestTest
             ->setDueDate(new \DateTime())
             ->setInvoicePDF($this->getFile())
             ->setShippingDate(new \DateTime())
+            ->setPaymentTarget(new \DateTime())
+            ->setRemark('a short descriptive sentence')
             ->setTrackingID(111);
 
         /**
@@ -168,21 +192,9 @@ class UpdateTransactionTest extends AbstractRequestTest
             ->setDueDate(new \DateTime())
             ->setInvoicePDF($this->getFile())
             ->setShippingDate(new \DateTime())
+            ->setPaymentTarget(new \DateTime())
+            ->setRemark('a short descriptive sentence')
             ->setTrackingID(111);
-
-        /**
-         * Test Required
-         */
-        $validation->getValidator($request);
-        $data = $validation->performValidation();
-
-        $this->assertValidationReturned(
-            'Upg\\Library\\Request\\UpdateTransaction',
-            'captureID',
-            'captureID is required',
-            $data,
-            "captureID is required validation failed to trigger"
-        );
 
         /**
          * Test Length
@@ -211,6 +223,8 @@ class UpdateTransactionTest extends AbstractRequestTest
             ->setDueDate(new \DateTime())
             ->setInvoicePDF($this->getFile())
             ->setShippingDate(new \DateTime())
+            ->setPaymentTarget(new \DateTime())
+            ->setRemark('a short descriptive sentence')
             ->setTrackingID(111);
 
         $validation = new Validation();
@@ -256,6 +270,8 @@ class UpdateTransactionTest extends AbstractRequestTest
             ->setDueDate(new \DateTime())
             ->setInvoicePDF($this->getFile())
             ->setShippingDate(new \DateTime())
+            ->setPaymentTarget(new \DateTime())
+            ->setRemark('a short descriptive sentence')
             ->setTrackingID(111);
 
         $validation = new Validation();
@@ -286,6 +302,8 @@ class UpdateTransactionTest extends AbstractRequestTest
             ->setDueDate(new \DateTime())
             ->setInvoicePDF($this->getFile())
             ->setShippingDate(new \DateTime())
+            ->setPaymentTarget(new \DateTime())
+            ->setRemark('a short descriptive sentence')
             ->setTrackingID(111);
 
         $validation = new Validation();
@@ -317,6 +335,8 @@ class UpdateTransactionTest extends AbstractRequestTest
             ->setDueDate(new \DateTime())
             ->setInvoicePDF($this->getFile())
             ->setShippingDate(new \DateTime())
+            ->setPaymentTarget(new \DateTime())
+            ->setRemark('a short descriptive sentence')
             ->setTrackingID($this->veryLongString);
 
         $validation = new Validation();
@@ -334,5 +354,67 @@ class UpdateTransactionTest extends AbstractRequestTest
             $data,
             "trackingID must be between 1 and 50 characters validation failed to trigger"
         );
+    }
+
+    public function testRemarkThatIsTooLong()
+    {
+        $request = new UpdateTransaction($this->config);
+
+        $request->setOrderID(1)
+            ->setCaptureID(1)
+            ->setInvoiceNumber(1)
+            ->setInvoiceDate(new \DateTime())
+            ->setOriginalInvoiceAmount($this->getAmount())
+            ->setDueDate(new \DateTime())
+            ->setInvoicePDF($this->getFile())
+            ->setShippingDate(new \DateTime())
+            ->setPaymentTarget(new \DateTime())
+            ->setRemark(str_repeat('a', 5000));
+
+        $validation = new Validation();
+
+        $validation->getValidator($request);
+        $data = $validation->performValidation();
+
+        $this->assertValidationReturned(
+            'Upg\\Library\\Request\\UpdateTransaction',
+            'remark',
+            'remark must be between 0 and 500 characters',
+            $data,
+            "remark must be between 0 and 500 characters characters validation failed to trigger"
+        );
+    }
+
+    public function testAddingTheFileDoesNotChangeMac()
+    {
+        $request = new UpdateTransaction($this->config);
+
+        $request->setOrderID(1)
+                ->setCaptureID(1)
+                ->setInvoiceNumber(1)
+                ->setInvoiceDate(new \DateTime())
+                ->setOriginalInvoiceAmount($this->getAmount())
+                ->setDueDate(new \DateTime())
+                ->setShippingDate(new \DateTime())
+                ->setPaymentTarget(new \DateTime())
+                ->setRemark('test');
+
+        /* First get the MAC without a file */
+        $macCalculator = new MacCalculator();
+        $macCalculator->setConfig($this->config);
+        $macCalculator->setRequest($request);
+        $withoutFile = $macCalculator->calculateMac();
+
+        /* Now add the file and regenerate the MAC these should be the same */
+        $request->setInvoicePDF($this->getFile());
+        $macCalculator->setRequest($request);
+        $withFile = $macCalculator->calculateMac();
+        $this->assertEquals($withoutFile, $withFile);
+
+        /* Make sure the MAC is updating as the values change */
+        $request->setRemark('different value to make sure the mac is updating');
+        $macCalculator->setRequest($request);
+        $differentRemark = $macCalculator->calculateMac();
+        $this->assertNotEquals($differentRemark, $withoutFile);
     }
 }

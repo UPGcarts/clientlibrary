@@ -13,7 +13,7 @@ class UpdateTransaction extends AbstractApi
     /**
      * URI for the updateTransaction call
      */
-    const UPDATE_TRANSACTION_PATH = 'capture';
+    const UPDATE_TRANSACTION_PATH = 'updateTransaction';
 
     /**
      * Constructor

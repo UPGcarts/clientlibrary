@@ -240,6 +240,8 @@ class UpdateTransactionTest extends \PHPUnit_Framework_TestCase
             ->setOriginalInvoiceAmount($this->getAmount())
             ->setShippingDate(new \DateTime())
             ->setInvoicePDF($this->getPDF())
+            ->setRemark('a test string')
+            ->setPaymentTarget(new \DateTime())
             ->setTrackingID("111222");
 
         $updateTransactionApi = new UpdateTransactionApi($this->config, $updateTransactionRequest);
