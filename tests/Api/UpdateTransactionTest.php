@@ -36,6 +36,6 @@ class UpdateTransactionTest extends \PHPUnit_Framework_TestCase
 
         $api = new UpdateTransactionApi($this->config, $request);
 
-        $this->assertEquals('http://www.something.com/capture', $api->getUrl());
+        $this->assertEquals('http://www.something.com/updateTransaction', $api->getUrl());
     }
 }
