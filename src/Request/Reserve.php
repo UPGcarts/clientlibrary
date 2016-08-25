@@ -10,7 +10,7 @@ use Upg\Library\Request\Attributes\ObjectArray;
 /**
  * Class CreateTransaction
  * This is the request class for any reserve request
- * @link http://www.manula.com/manuals/payco/payment-api/hostedpagesdraft/en/topic/reserve
+ * @link https://documentation.upgplc.com/hostedpagesdraft/en/topic/reserve
  * @package Upg\Library\Request
  */
 class Reserve extends AbstractRequest
@@ -25,7 +25,7 @@ class Reserve extends AbstractRequest
     /**
      * The PaymentMethod that should be used
      * @see \Upg\Library\PaymentMethods\Methods
-     * @link http://www.manula.com/manuals/payco/payment-api/hostedpagesdraft/en/topic/paymentmethods
+     * @link https://documentation.upgplc.com/hostedpagesdraft/en/topic/paymentmethods
      * @var string
      */
     private $paymentMethod;

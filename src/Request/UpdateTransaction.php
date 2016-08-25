@@ -13,6 +13,7 @@ use Upg\Library\Validation\Helper\Constants;
  * of an open receivable to the collection agencies to initiate the dunning process requires detailed
  * information on the receivable.
  *
+ * @link https://documentation.upgplc.com/hostedpagesdraft/en/topic/updatetransaction
  * @package Upg\Library\Request
  */
 class UpdateTransaction extends AbstractRequest

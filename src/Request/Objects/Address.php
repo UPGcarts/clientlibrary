@@ -7,7 +7,7 @@ use Upg\Library\Validation\Helper\Regex;
 /**
  * Class Address
  * For JSON address objects
- * @link http://www.manula.com/manuals/payco/payment-api/hostedpagesdraft/en/topic/json-objects
+ * @link https://documentation.upgplc.com/hostedpagesdraft/en/topic/address
  * @package Upg\Library\Request\Objects
  */
 class Address extends AbstractObject
