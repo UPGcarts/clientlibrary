@@ -5,7 +5,7 @@ use Upg\Library\Config;
 
 /**
  * Class UpdateTransaction
- * @link http://www.manula.com/manuals/payco/payment-api/hostedpagesdraft/en/topic/updatetransactiondata
+ * @link https://documentation.upgplc.com/hostedpagesdraft/en/topic/updatetransaction
  * @package Upg\Library\Api
  */
 class UpdateTransaction extends AbstractApi
