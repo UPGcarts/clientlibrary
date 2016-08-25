@@ -351,47 +351,17 @@ class UpdateTransaction extends AbstractRequest
     public function setTrackingID($trackingID)
     {
         $this->trackingID = $trackingID;
-
         return $this;
     }
 
     /**
      * Set the trackingID field
-     *
      * @see UpdateTransaction::trackingID
      * @return string
      */
     public function getTrackingID()
     {
         return $this->trackingID;
-    }
-
-    /**
-     * Set the remark field
-     *
-     * @see UpdateTransaction::remark
-     *
-     * @param $remark
-     *
-     * @return $this
-     */
-    public function setRemark($remark)
-    {
-        $this->remark = $remark;
-
-        return $this;
-    }
-
-    /**
-     * Get the remark field
-     *
-     * @see UpdateTransaction::remark
-     *
-     * @return string
-     */
-    public function getRemark()
-    {
-        return $this->remark;
     }
 
     /**
@@ -468,6 +438,11 @@ class UpdateTransaction extends AbstractRequest
             'message' => "orderID must be between 1 and 30 characters"
         );
 
+        $validationData['captureID'][] = array(
+            'name' => 'required',
+            'value' => null,
+            'message' => "captureID is required"
+        );
 
         $validationData['captureID'][] = array(
             'name'    => 'MaxLength',
