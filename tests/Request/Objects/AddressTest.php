@@ -25,7 +25,6 @@ class AddressTest extends AbstractRequestTest
     {
         $address = new Address();
         $address->setStreet("Test")
-            ->setNo(45)
             ->setZip("LS12 4TN")
             ->setCity("City")
             ->setState("State")
@@ -74,49 +73,6 @@ class AddressTest extends AbstractRequestTest
             "Street length validation did not work"
         );
 
-    }
-
-    /**
-     * Test validation on the no field
-     */
-    public function testAddressTestValidationNoFailure()
-    {
-        $validation = new Validation();
-
-        $address = new Address();
-        $address->setNo(null)
-            ->setStreet("Test")
-            ->setZip("LS12 4TN")
-            ->setCity("City")
-            ->setState("State")
-            ->setCountry("GB");
-
-        $validation->getValidator($address);
-        $data = $validation->performValidation();
-
-        /**
-         * Test the house no required
-         */
-        $this->assertValidationReturned(
-            'Upg\\Library\\Request\\Objects\\Address',
-            'no',
-            'House number is required',
-            $data,
-            "House number required check failed"
-        );
-
-        /** Length tests */
-        $address->setNo("LoremipsumdolorsitametconsecteturadipiscingelitPraesentsitametdictumnequequiseuismodarcu");
-        $validation->getValidator($address);
-        $data = $validation->performValidation();
-
-        $this->assertValidationReturned(
-            'Upg\\Library\\Request\\Objects\\Address',
-            'no',
-            'House number must be between 1 and 32 characters',
-            $data,
-            "House number length check failed"
-        );
     }
 
     /**
